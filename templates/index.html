@@ -1,0 +1,26 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+
+    <meta name="author" content="Adrià Arroyo">
+    <meta name="description" content="A game made by Adria Arroyo">
+
+    <title>A game</title>
+
+    <link rel="shortcut icon" href="{{ url_for('static', filename='favicon.ico') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+    <script type="text/javascript" src="{{url_for('static',filename='code.js')}}" defer></script>
+    <script src="https://cdn.socket.io/4.7.2/socket.io.min.js" integrity="sha384-mZLF4UVrpi/QTWPA7BjNPEnkIfRFn4ZEO3Qt/HFklTJBj/gBOV8G3HcKn4NfQblz" crossorigin="anonymous"></script>
+</head>
+
+<body>
+    <canvas id="canvas" style="position: absolute;">
+        Tu navegador no admite el elemento &lt;canvas&gt;.
+    </canvas>
+    <canvas id="canvasui" style="position: absolute;">
+        Tu navegador no admite el elemento &lt;canvas&gt;.
+    </canvas>
+</body>
