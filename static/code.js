@@ -14,6 +14,7 @@ let downPress = false;
 const socket = io("/game");
 let players = {};
 let bullets = {};
+let npcs = {};
 let mysocketid;
 
 function resize() {
@@ -141,6 +142,52 @@ class Player {
     }
 }
 
+class NPC {
+    constructor(initPack) {
+        this.id = initPack.id;
+        this.x = initPack.x;
+        this.y = initPack.y;
+        this.dx = this.x;
+        this.dy = this.y;
+        this.hp = initPack.hp;
+        this.maxHp = initPack.maxHp;
+        this.vx = 0;
+        this.vy = 0;
+        this.size = 30;
+        npcs[this.id] = this;
+    }
+
+    update() {
+        this.vx = (this.dx - this.x) / 2
+        this.vy = (this.dy - this.y) / 2
+
+        this.x += this.vx;
+        this.y += this.vy;
+    }
+
+    draw() {
+        
+        let x = this.x - players[mysocketid].x + htmlCanvas.width/2;
+        let y = this.y - players[mysocketid].y + htmlCanvas.height/2;
+        
+        // HP bar
+        let hpmw = 5 * this.maxHp
+        let hph = 4
+        let hpWidth = hpmw * this.hp / this.maxHp;
+        let hpx = x - hpmw / 2;
+        let hpy = y - this.size - hph - 10;
+        
+        ctx.fillStyle = "red";
+        ctx.fillRect(hpx,hpy, hpmw, hph);
+        ctx.fillStyle = "green";
+        ctx.fillRect(hpx, hpy, hpWidth, hph)
+        
+        ctx.fillStyle = "brown";
+        ctx.fillRect(x - this.size/2, y - this.size/2, this.size, this.size);
+
+    }
+}
+
 class Bullet {
     constructor(initPack) {
         this.id = initPack.id;
@@ -183,6 +230,10 @@ function updateWorld() {
         players[player].update();
     }
 
+    for (const npc in npcs) {
+        npcs[npc].update();
+    }
+
     draw();
     requestAnimationFrame(updateWorld);
 }
@@ -203,6 +254,10 @@ function draw() {
 
     for (const player in players) {
         players[player].draw();
+    }
+
+    for (const npc in npcs) {
+        npcs[npc].draw();
     }
 }
 
@@ -235,7 +290,6 @@ socket.on("player_connected", function (playerData) {
 });
 
 socket.on("init", function (data) {
-    console.log("Init_: ", data)
 
     if(data.playerid){
         mysocketid = data.playerid;
@@ -249,6 +303,11 @@ socket.on("init", function (data) {
     if (data.bullets) {
         for (const b of data.bullets) {
             new Bullet(b);
+        }
+    }
+    if (data.npcs) {
+        for (const n of data.npcs) {
+            new NPC(n);
         }
     }
 });
@@ -290,14 +349,36 @@ socket.on("update", function (data) {
             }
         }
     }
+    if(data.npcs) {
+        for (const npcData of data.npcs) {
+            let npc = npcs[npcData.id];
+            if (npc) {
+                
+                if (npcData.x !== undefined) {
+                    npc.dx = npcData.x;
+                }
+                
+                if (npcData.y !== undefined) {
+                    npc.dy = npcData.y;
+                }
+            
+                if (npcData.hp !== undefined) {
+                    npc.hp = npcData.hp;
+                }
+                
+            }
+        }
+    }
 });
 
 socket.on("remove", function (data) {
-    console.log("Remove: ", data)
     for (let i = 0; i < data.players.length; i++) {
         delete players[data.players[i]];
     }
     for (let i = 0; i < data.bullets.length; i++) {
         delete bullets[data.bullets[i]];
+    }
+    for (let i = 0; i < data.npcs.length; i++) {
+        delete npcs[data.npcs[i]];
     }
 }); 
