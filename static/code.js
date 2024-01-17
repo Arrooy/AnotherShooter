@@ -48,10 +48,14 @@ document.addEventListener('keydown', (e) => {
     else if (e.code === "Digit1") socket.emit('keypress', {inputId: "switch_weapon", state: 1})
     else if (e.code === "Digit2") socket.emit('keypress', {inputId: "switch_weapon", state: 2})
     else if (e.code === "Digit3") socket.emit('keypress', {inputId: "switch_weapon", state: 3})
+    else if (e.code === "Digit4") socket.emit('keypress', {inputId: "switch_weapon", state: 4})
+    else if (e.code === "Digit5") socket.emit('keypress', {inputId: "switch_weapon", state: 5})
 });
 
 
 document.addEventListener("mousemove", (e) => {
+    if(players[mysocketid] === undefined)
+        return;
     let x = -htmlCanvas.width / 2 + e.clientX
     let y = -htmlCanvas.height / 2 + e.clientY
     let angle = (Math.atan2(y, x) / Math.PI) * 180.0;
@@ -74,6 +78,7 @@ class Player {
         this.maxHp = initPack.maxHp;
         this.score = initPack.score;
         this.angle = 0;
+        this.size = initPack.size;
         this.vx = 0;
         this.vy = 0;
         
@@ -110,8 +115,8 @@ class Player {
     }
 
     drawRotatedPlayer(x,y){
-        let width = 50;
-        let height = 50;
+        let width = this.size;
+        let height = this.size;
         x = x - width/2;
         y = y - height/2;
         // first save the untranslated/unrotated context
@@ -151,9 +156,9 @@ class NPC {
         this.dy = this.y;
         this.hp = initPack.hp;
         this.maxHp = initPack.maxHp;
+        this.size = initPack.size;;
         this.vx = 0;
         this.vy = 0;
-        this.size = 30;
         npcs[this.id] = this;
     }
 
@@ -290,7 +295,7 @@ socket.on("player_connected", function (playerData) {
 });
 
 socket.on("init", function (data) {
-
+    console.log("init",data)        
     if(data.playerid){
         mysocketid = data.playerid;
     }
@@ -372,6 +377,7 @@ socket.on("update", function (data) {
 });
 
 socket.on("remove", function (data) {
+    console.log("remove", data)
     for (let i = 0; i < data.players.length; i++) {
         delete players[data.players[i]];
     }

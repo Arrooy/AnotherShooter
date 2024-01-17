@@ -22,12 +22,12 @@ class Entity():
         return {"id":self.id, "x":self.x, "y":self.y, "vx":self.vx, "vy":self.vy}
 
 class ColisionEntity(Entity):
-    def __init__(self, id, x, y, vx, vy, max_speed=20) -> None:
+    def __init__(self, id, x, y, vx, vy, max_speed=20, size=32) -> None:
         super().__init__(id, x, y, vx, vy, max_speed)
-    
-            
+        self.size = size
+        
     def check_colision(self,objective):
-        if self.getDistance(objective) < 32 and self.id != objective.id:
+        if self.getDistance(objective) < (self.size/2+objective.size/2) and self.id != objective.id:
             # Repel the colision
             self.stop()
             objective.stop()

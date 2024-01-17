@@ -1,10 +1,10 @@
 from __init__ import Game
-from Weapon import Weapon, Shotgun, GranadeLauncher
+from Weapon import Weapon, Shotgun, GranadeLauncher, Rocket, MachineGun
 from Entity import ColisionEntity
     
 class Player(ColisionEntity):
-    def __init__(self, id, x, y) -> None:
-        super().__init__(id, x, y, 0, 0)
+    def __init__(self, id, x, y, size) -> None:
+        super().__init__(id, x, y, 0, 0, size=size)
         self.w = False
         self.d = False
         self.s = False
@@ -15,9 +15,7 @@ class Player(ColisionEntity):
         self.maxHp = 10
         self.score = 0
         self.current_weapon = 0
-        self.weapons = [Weapon( self, max_bullet_speed=25, range=100, attack_speed_ms=150, damage=1, bullet_size=25),
-                        Shotgun(self, max_bullet_speed=20, range=35,  attack_speed_ms=200, damage=0.1, bullet_size=10),
-                        GranadeLauncher(self, max_bullet_speed=20, range=25,  attack_speed_ms=200, damage=2, bullet_size=10)]
+        self.weapons = [Weapon(self), Shotgun(self), GranadeLauncher(self), Rocket(self), MachineGun(self)]
         
         Game.players[self.id] = self
         
@@ -46,6 +44,7 @@ class Player(ColisionEntity):
             self.shootBullet(self.mouseAngle)
             
         if self.hp <= 0:
+            self.hp = 0
             self.toRemove = True    
     
     def switch_weapon(self, weapon_number):
@@ -57,7 +56,7 @@ class Player(ColisionEntity):
     
     def init_json(self):
         entity_json = super().toJson()
-        player_json = {"maxHp":self.maxHp,"hp":self.hp, "score": self.score}
+        player_json = {"maxHp":self.maxHp, "size":self.size, "hp":self.hp, "score": self.score}
         entity_json.update(player_json)
         return entity_json
         

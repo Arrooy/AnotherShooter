@@ -5,8 +5,8 @@ import time
 import math
 
 class NPC(ColisionEntity):
-    def __init__(self, id, x, y, hp, damage, attack_speed) -> None:
-        super().__init__(id, x, y, 0, 0, max_speed=10)
+    def __init__(self, id, x, y, hp, damage, attack_speed, size) -> None:
+        super().__init__(id, x, y, 0, 0, max_speed=10, size=size)
         self.hp = hp
         self.maxHp = hp
         self.damage = damage
@@ -33,10 +33,11 @@ class NPC(ColisionEntity):
                 self.attack(Game.players[i])            
             
         if self.hp <= 0:
+            self.hp = 0
             self.toRemove = True 
     
     def behave(self):
-        # Roam
+        # Find closest player in sight (500)
         min_distance = None
         closest_player = None
         for i in Game.players:
@@ -49,21 +50,23 @@ class NPC(ColisionEntity):
                 closest_player = player
                 min_distance = distance
         
-        if closest_player is not None:
+        if closest_player is not None and min_distance != 0 and min_distance < 500:
             ## Found a player, follow it.
             self.vx = self.max_speed * (closest_player.x - self.x)/min_distance
             self.vy = self.max_speed * (closest_player.y - self.y)/min_distance
-   
+        else:
+            self.vx = 0
+            self.vy = 0
     
     
     def attack(self, player):
         if time.time_ns() - self.last_attack_time >= 1_000_000 * self.attack_speed_ms:
             self.last_attack_time = time.time_ns()
-            player.hp -= 1
+            player.hp -= self.damage
     
     def init_json(self):
         entity_json = super().toJson()
-        player_json = {"maxHp":self.maxHp,"hp":self.hp}
+        player_json = {"maxHp":self.maxHp, "size": self.size, "hp":self.hp}
         entity_json.update(player_json)
         return entity_json
     

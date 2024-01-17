@@ -39,7 +39,7 @@ class Bullet(Entity):
         
     def check_colision(self, objective):
             
-        if objective.hp > 0 and self.getDistance(objective) < 32 and self.parentId != objective.id:
+        if objective.hp > 0 and self.getDistance(objective) < (self.size/2 + objective.size/2) and self.parentId != objective.id:
             objective.hp -= self.damage
             if objective.hp <= 0:
                 shooter = Game.players[self.parentId]

@@ -47,6 +47,15 @@ class Game(Namespace):
     npcs = {}
     new_stuff = {}
     
+    def update_list(list_id, dictionary, to_remove):
+        for id in list(dictionary.keys()):
+            item = dictionary[id]
+            item.update()
+            
+            if item.toRemove:
+                to_remove[list_id].append(id)
+                del dictionary[id]
+    
     def thread_function(sock):
         
         from NPC import NPC
@@ -57,54 +66,41 @@ class Game(Namespace):
             if True:
                 if random() < 0.01:
                     print("Creating Mob")
-                    NPC(random(), 0, 0, 10, 1, 500)
-                    
-                remove = {"players":[], "bullets":[], "npcs":[]}            
-                for id in list(Game.players.keys()):
-                    player = Game.players[id]
-                    player.update()
-                    
-                    if player.toRemove:
-                        remove["players"].append(id)
-                        del Game.players[id]
+                    NPC(random(), 0, 0, 10, 1, attack_speed=500,size=50)
                 
-                for id in list(Game.npcs.keys()):
-                    npc = Game.npcs[id]
-                    npc.update()
-                    
-                    if npc.toRemove:
-                        remove["npcs"].append(id)
-                        del Game.npcs[id]
+                                
+                to_remove = {"players":[], "bullets":[], "npcs":[]}            
                 
-                for id in list(Game.bullets.keys()):
-                    bullet = Game.bullets[id]
-                    bullet.update()
-                        
-                    if bullet.toRemove:
-                        remove["bullets"].append(id)
-                        del Game.bullets[id]
-                        
+                # Update game and check for any entity that needs to be removed.
+                Game.update_list("players", Game.players, to_remove)
+                Game.update_list("npcs", Game.npcs, to_remove)
+                Game.update_list("bullets", Game.bullets, to_remove)
+                    
+                # init data
                 if Game.new_stuff:
                     game_data = {}
                     
                     if "bullets" in Game.new_stuff:
-                        game_data.update({"bullets": [Game.new_stuff["bullets"][bullet].update_json() for bullet in Game.new_stuff["bullets"]]})
+                        # Only add bullet if still exists.
+                        game_data.update({"bullets": [Game.new_stuff["bullets"][bullet].update_json() for bullet in Game.new_stuff["bullets"] if not Game.new_stuff["bullets"][bullet].toRemove]})
                     
                     if "npcs" in Game.new_stuff:
                         game_data.update({"npcs": [Game.new_stuff["npcs"][npc].init_json() for npc in Game.new_stuff["npcs"]]})
                     
                     socketio.emit("init", game_data, namespace="/game")
-                    Game.new_stuff = {}
-               
-                if remove["players"] or remove["bullets"] or remove["npcs"] :
-                    socketio.emit("remove", remove, namespace="/game")
-        
+                    Game.new_stuff = {}           
+                     
                 game_data = {
                     "players": [Game.players[player].update_json() for player in Game.players],
                     "bullets": [Game.bullets[bullet].update_json() for bullet in Game.bullets],
                     "npcs":    [Game.npcs[npc].update_json() for npc in Game.npcs],
                 }
                 socketio.emit("update", game_data, namespace="/game")
+                
+                # Remove data
+                if to_remove["players"] or to_remove["bullets"] or to_remove["npcs"]:
+                    socketio.emit("remove", to_remove, namespace="/game")
+                    
             """except Exception as e: 
                 print("Unable to send while loop.")
                 print(e)"""
@@ -113,7 +109,7 @@ class Game(Namespace):
 
     def on_connect(self, data):
         from Player import Player
-        Player(request.sid, 0,0)
+        Player(request.sid, 0,0, 50)
         emit("player_connected", Game.players[request.sid].init_json(), broadcast=True, include_self=False)
         game_data = {
             "playerid":request.sid,
