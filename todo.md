@@ -1,0 +1,1 @@
+One bullet deals damage to all mobs impacted. Is this acceptable?

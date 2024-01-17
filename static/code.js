@@ -3,7 +3,6 @@ var ctx = htmlCanvas.getContext("2d");
 
 var htmlCanvasUi = document.getElementById("canvasui"); 
 var ctxUi = htmlCanvasUi.getContext("2d");
-ctxUi.font = "40px Arial";
 
 let x = 10;
 let y = 10;
@@ -65,32 +64,60 @@ document.addEventListener("mousemove", (e) => {
 
 resize();
 
-
-
-class Player {
-    constructor(initPack) {
+class Entity { 
+    constructor(initPack){
         this.id = initPack.id;
         this.x = initPack.x;
         this.y = initPack.y;
+        this.size = initPack.size;
         this.dx = this.x;
         this.dy = this.y;
-        this.hp = initPack.hp;
-        this.maxHp = initPack.maxHp;
-        this.score = initPack.score;
-        this.angle = 0;
-        this.size = initPack.size;
         this.vx = 0;
         this.vy = 0;
-        
-        players[this.id] = this;
     }
+
 
     update() {
         this.vx = (this.dx - this.x) / 2
         this.vy = (this.dy - this.y) / 2
-
+      
         this.x += this.vx;
         this.y += this.vy;
+    }
+}
+
+class ColisionEntity extends Entity { 
+    constructor(initPack) {
+        super(initPack);
+        this.hp = initPack.hp;
+        this.maxHp = initPack.maxHp;
+    }
+
+    drawHpBar(x, y){
+        // HP bar
+        let hpmw = 5 * this.maxHp
+        let hph = 4
+        let hpWidth = hpmw * this.hp / this.maxHp;
+        let hpx = x - hpmw / 2;
+        let hpy = y - this.size - hph - 10;
+        
+        ctx.fillStyle = "red";
+        ctx.fillRect(hpx, hpy, hpmw, hph);
+        ctx.fillStyle = "green";
+        ctx.fillRect(hpx, hpy, hpWidth, hph)
+    }
+}
+
+class Player extends ColisionEntity {
+    constructor(initPack) {
+        super(initPack);
+        this.angle = 0;
+        this.score = 0;
+        players[this.id] = this;
+    }
+
+    update() {
+        super.update()
     }
 
     draw() {
@@ -98,17 +125,7 @@ class Player {
         let x = this.x - players[mysocketid].x + htmlCanvas.width/2;
         let y = this.y - players[mysocketid].y + htmlCanvas.height/2;
         
-        // HP bar
-        let hpmw = 5 * this.maxHp
-        let hph = 4
-        let hpWidth = hpmw * this.hp / this.maxHp;
-        let hpx = x - hpmw / 2;
-        let hpy = y - 25 - hph - 10;
-        
-        ctx.fillStyle = "red";
-        ctx.fillRect(hpx,hpy, hpmw, hph);
-        ctx.fillStyle = "green";
-        ctx.fillRect(hpx, hpy, hpWidth, hph)
+        super.drawHpBar(x, y);
         
         this.drawRotatedPlayer(x,y);
 
@@ -147,27 +164,14 @@ class Player {
     }
 }
 
-class NPC {
+class NPC extends ColisionEntity{
     constructor(initPack) {
-        this.id = initPack.id;
-        this.x = initPack.x;
-        this.y = initPack.y;
-        this.dx = this.x;
-        this.dy = this.y;
-        this.hp = initPack.hp;
-        this.maxHp = initPack.maxHp;
-        this.size = initPack.size;;
-        this.vx = 0;
-        this.vy = 0;
+        super(initPack);
         npcs[this.id] = this;
     }
 
     update() {
-        this.vx = (this.dx - this.x) / 2
-        this.vy = (this.dy - this.y) / 2
-
-        this.x += this.vx;
-        this.y += this.vy;
+        super.update()
     }
 
     draw() {
@@ -175,17 +179,7 @@ class NPC {
         let x = this.x - players[mysocketid].x + htmlCanvas.width/2;
         let y = this.y - players[mysocketid].y + htmlCanvas.height/2;
         
-        // HP bar
-        let hpmw = 5 * this.maxHp
-        let hph = 4
-        let hpWidth = hpmw * this.hp / this.maxHp;
-        let hpx = x - hpmw / 2;
-        let hpy = y - this.size - hph - 10;
-        
-        ctx.fillStyle = "red";
-        ctx.fillRect(hpx,hpy, hpmw, hph);
-        ctx.fillStyle = "green";
-        ctx.fillRect(hpx, hpy, hpWidth, hph)
+        super.drawHpBar(x, y);
         
         ctx.fillStyle = "brown";
         ctx.fillRect(x - this.size/2, y - this.size/2, this.size, this.size);
@@ -193,25 +187,14 @@ class NPC {
     }
 }
 
-class Bullet {
+class Bullet extends Entity{
     constructor(initPack) {
-        this.id = initPack.id;
-        this.x = initPack.x;
-        this.y = initPack.y;
-        this.dx = this.x;
-        this.dy = this.y;
-        this.vx = 0;
-        this.vy = 0;
-        this.size = initPack.size;
+        super(initPack);
         bullets[this.id] = this;
     }
 
     update() {
-        this.vx = (this.dx - this.x) / 2
-        this.vy = (this.dy - this.y) / 2
-
-        this.x += this.vx;
-        this.y += this.vy;
+        super.update()
     }
 
     draw() {
