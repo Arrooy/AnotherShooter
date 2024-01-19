@@ -3,7 +3,6 @@ import random
 
 class Item(ColisionEntity):
     def __init__(self, name, carrier, active_function) -> None:
-        # Compute x, y based on carrier. Dont overlap items.
         super().__init__(random.random(), carrier.x, carrier.y, 0, 0, 0, size=20)
         self.carrier = carrier
         self.name = name
@@ -13,8 +12,7 @@ class Item(ColisionEntity):
         self.parent = None
         
     def update(self):
-        self.x = self.carrier.x
-        self.y = self.carrier.y
+                    
         self.timer+=1
         if self.timer > self.droptime:
             self.toRemove = True

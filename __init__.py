@@ -59,6 +59,25 @@ class Game(Namespace):
                 to_remove[list_id].append(id)
                 del dictionary[id]
     
+    def generate_empty_coords(spawn_x, spawn_y, area, size, iterations=0):
+        if iterations > 4:
+            area = area + size
+            
+        x = spawn_x + random() * area - area/2 
+        y = spawn_y + random() * area - area/2 
+        
+        for i in Game.npcs:
+            npc = Game.npcs[i]
+            if npc.getDistancexy(x,y) < npc.size/2+size/2:
+                x,y = Game.generate_empty_coords(spawn_x, spawn_x, area, size, iterations+1)
+        
+        for i in Game.players:
+            player = Game.players[i]
+            if player.getDistancexy(x,y) < player.size/2+size/2:
+                x,y = Game.generate_empty_coords(spawn_x, spawn_x, area, size, iterations+1)
+        
+        return x,y
+        
     def thread_function(sock):
         
         from NPC import NPC
@@ -77,8 +96,10 @@ class Game(Namespace):
                 from Item import HealingPotion
                 if random() < 0.01:
                     print("Creating Mob")
-                    npc = NPC(random(), 0, 0, 10, 1, attack_speed=500,size=50)
+                    x,y = Game.generate_empty_coords(0,0,50,50)
+                    npc = NPC(random(), x, y, 10, 1, attack_speed=500,size=50)
                     npc.addItem(HealingPotion(npc))
+                    
                 
                                 
                 to_remove = {"players":[], "bullets":[], "npcs":[], "dropped_items":[]}            

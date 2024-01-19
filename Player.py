@@ -47,7 +47,7 @@ class Player(EntityWithItems):
         
         # Check colision with other ColisionEntities.
         for i in Game.npcs:
-            self.check_colision_repel(Game.npcs[i])
+            self.check_colision_stop(Game.npcs[i])
             
         # Check for colision with items
         for i in Game.dropped_items:

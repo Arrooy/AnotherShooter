@@ -28,10 +28,14 @@ class NPC(EntityWithItems):
         super().update()
         # Check colision with other ColisionEntities.
         for i in Game.players:
-            if self.check_colision_repel(Game.players[i]):
+            if self.check_colision_stop(Game.players[i]):
                 # Touched a player
                 self.attack(Game.players[i])      
-            
+        
+        # Repel otrher npcs
+        for i in Game.npcs:
+            self.check_colision_repel(Game.npcs[i])
+        
         if self.hp <= 0:
             self.hp = 0
             self.dropItems()
