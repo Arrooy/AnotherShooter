@@ -147,7 +147,8 @@ class Game(Namespace):
     def on_start_game(self, name):
         
         from Player import Player
-        Player(request.sid, name, 0,0, 50)
+        x,y = Game.generate_empty_coords(0,0,50,50)
+        Player(request.sid, name, x, y, 50)
         emit("player_connected", Game.players[request.sid].init_json(), broadcast=True, include_self=False)
         game_data = {
             "playerid":request.sid,
