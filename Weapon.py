@@ -44,3 +44,7 @@ class Rocket(Weapon):
 class MachineGun(Weapon):
     def __init__(self, parent, max_bullet_speed=25, range=75, attack_speed_ms=50, damage=0.5, bullet_size=5) -> None:
         super().__init__(parent, max_bullet_speed, range, attack_speed_ms, damage, bullet_size)
+
+class Sniper(Weapon):
+    def __init__(self, parent, max_bullet_speed=45, range=75, attack_speed_ms=2000, damage=5, bullet_size=7) -> None:
+        super().__init__(parent, max_bullet_speed, range, attack_speed_ms, damage, bullet_size)

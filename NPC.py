@@ -1,10 +1,10 @@
-from Entity import ColisionEntity
+from Entity import EntityWithItems
 from __init__ import Game
 import random
 import time
 import math
 
-class NPC(ColisionEntity):
+class NPC(EntityWithItems):
     def __init__(self, id, x, y, hp, damage, attack_speed, size) -> None:
         super().__init__(id, x, y, 0, 0, max_speed=10, size=size)
         self.hp = hp
@@ -28,12 +28,13 @@ class NPC(ColisionEntity):
         super().update()
         # Check colision with other ColisionEntities.
         for i in Game.players:
-            if self.check_colision(Game.players[i]):
+            if self.check_colision_repel(Game.players[i]):
                 # Touched a player
-                self.attack(Game.players[i])            
+                self.attack(Game.players[i])      
             
         if self.hp <= 0:
             self.hp = 0
+            self.dropItems()
             self.toRemove = True 
     
     def behave(self):

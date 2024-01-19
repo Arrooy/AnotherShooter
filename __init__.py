@@ -38,6 +38,7 @@ def create_app():
     
     return app
 
+
 class Game(Namespace):
     """
         WebSocket Manager
@@ -45,8 +46,10 @@ class Game(Namespace):
     players = {}
     bullets = {}
     npcs = {}
+    dropped_items = {}
     new_stuff = {}
     
+    once = True
     def update_list(list_id, dictionary, to_remove):
         for id in list(dictionary.keys()):
             item = dictionary[id]
@@ -64,18 +67,28 @@ class Game(Namespace):
                 time.sleep(0.5)
             #try:
             if True:
+                """
+                if Game.once:
+                    from Item import HealingPotion
+                    npc = NPC(random(), 100, 100, 10, 1, attack_speed=500,size=50)
+                    npc.addItem(HealingPotion(npc))
+                    Game.once = False
+                """
+                from Item import HealingPotion
                 if random() < 0.01:
                     print("Creating Mob")
-                    NPC(random(), 0, 0, 10, 1, attack_speed=500,size=50)
+                    npc = NPC(random(), 0, 0, 10, 1, attack_speed=500,size=50)
+                    npc.addItem(HealingPotion(npc))
                 
                                 
-                to_remove = {"players":[], "bullets":[], "npcs":[]}            
+                to_remove = {"players":[], "bullets":[], "npcs":[], "dropped_items":[]}            
                 
                 # Update game and check for any entity that needs to be removed.
+                Game.update_list("bullets", Game.bullets, to_remove)
                 Game.update_list("players", Game.players, to_remove)
                 Game.update_list("npcs", Game.npcs, to_remove)
-                Game.update_list("bullets", Game.bullets, to_remove)
-                    
+                Game.update_list("dropped_items", Game.dropped_items, to_remove)
+                
                 # init data
                 if Game.new_stuff:
                     game_data = {}
@@ -86,6 +99,9 @@ class Game(Namespace):
                     
                     if "npcs" in Game.new_stuff:
                         game_data.update({"npcs": [Game.new_stuff["npcs"][npc].init_json() for npc in Game.new_stuff["npcs"]]})
+                    
+                    if "dropped_items" in Game.new_stuff:
+                        game_data.update({"dropped_items": [Game.new_stuff["dropped_items"][item].init_json() for item in Game.new_stuff["dropped_items"]]})
                     
                     socketio.emit("init", game_data, namespace="/game")
                     Game.new_stuff = {}           
@@ -98,7 +114,7 @@ class Game(Namespace):
                 socketio.emit("update", game_data, namespace="/game")
                 
                 # Remove data
-                if to_remove["players"] or to_remove["bullets"] or to_remove["npcs"]:
+                if to_remove["players"] or to_remove["bullets"] or to_remove["npcs"] or to_remove["dropped_items"]:
                     socketio.emit("remove", to_remove, namespace="/game")
                     
             """except Exception as e: 
@@ -116,6 +132,7 @@ class Game(Namespace):
             "players": [Game.players[player].init_json() for player in Game.players],
             "bullets": [Game.bullets[bullet].update_json() for bullet in Game.bullets],
             "npcs": [Game.npcs[npc].init_json() for npc in Game.npcs],
+            "dropped_items":[Game.dropped_items[item].init_json() for item in Game.dropped_items],
         }
         emit("init",game_data)
 
@@ -139,6 +156,10 @@ class Game(Namespace):
             player.s = data["state"]
         if(data["inputId"] == "a"):
             player.a = data["state"]
+        
+        if(data["inputId"] == "use_item"):
+            player.use_item(data["state"])
+        
         if data["inputId"] == "attack":
             player.attackPressed = data["state"]
         if data["inputId"] == "mouseAngle":

@@ -1,20 +1,19 @@
 from __init__ import Game
-from Entity import Entity
+from Entity import ColisionEntity
 
 import math
 import random
 
 
-class Bullet(Entity):
+class Bullet(ColisionEntity):
     def __init__(self, parent, angle, max_speed, range, damage, bullet_size) -> None:
         vx_ = math.cos(angle/180.0*math.pi) * max_speed
         vy_ = math.sin(angle/180.0*math.pi) * max_speed
-        super().__init__(random.random(), parent.x, parent.y, vx_, vy_)
+        super().__init__(random.random(), parent.x, parent.y, vx_, vy_, size=bullet_size)
         self.timer = 0
         self.range = range
         self.parentId = parent.id
         self.damage = damage
-        self.size = bullet_size
         self.max_speed = max_speed
         
         Game.bullets[self.id] = self
@@ -28,18 +27,23 @@ class Bullet(Entity):
         self.timer+=1
         if self.timer > self.range:
             self.toRemove = True
+            return
             
         super().update()
         
         for i in Game.players:
-            self.check_colision(Game.players[i])
+            # Only one colision per bullet
+            if self.check_colision(Game.players[i]):
+                return
         
         for i in Game.npcs:
-            self.check_colision(Game.npcs[i])
+            # Only one colision per bullet
+            if self.check_colision(Game.npcs[i]):
+                return
         
     def check_colision(self, objective):
             
-        if objective.hp > 0 and self.getDistance(objective) < (self.size/2 + objective.size/2) and self.parentId != objective.id:
+        if objective.hp > 0 and super().check_colision(self.parentId, objective):
             objective.hp -= self.damage
             if objective.hp <= 0:
                 shooter = Game.players[self.parentId]
@@ -47,6 +51,8 @@ class Bullet(Entity):
                     shooter.score += 1
                 
             self.toRemove = True
+            return True
+        return False
     
     
     def update_json(self):

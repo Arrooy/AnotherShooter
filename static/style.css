@@ -11,3 +11,28 @@ canvas {
     width: 100vw;
     display: block;
 }
+
+.ui_button_bar{
+    width: 100vw;
+    position: absolute;
+    display: flex;
+    justify-content: end;
+    bottom:0px;
+}
+
+.ui_button {
+    white-space:nowrap;
+}
+
+
+.ui_weapon{
+    height: 75px;
+    float:left;
+    clear:none; 
+}
+
+.flex_expanded{
+    display: flex;
+    width: 100%;
+    align-items: start;
+}

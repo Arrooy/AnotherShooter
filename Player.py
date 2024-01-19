@@ -1,8 +1,10 @@
+
+from extensions import socketio
 from __init__ import Game
-from Weapon import Weapon, Shotgun, GranadeLauncher, Rocket, MachineGun
-from Entity import ColisionEntity
-    
-class Player(ColisionEntity):
+from Weapon import Weapon, Shotgun, GranadeLauncher, Rocket, MachineGun, Sniper
+from Entity import EntityWithItems
+
+class Player(EntityWithItems):
     def __init__(self, id, x, y, size) -> None:
         super().__init__(id, x, y, 0, 0, size=size)
         self.w = False
@@ -15,11 +17,15 @@ class Player(ColisionEntity):
         self.maxHp = 10
         self.score = 0
         self.current_weapon = 0
-        self.weapons = [Weapon(self), Shotgun(self), GranadeLauncher(self), Rocket(self), MachineGun(self)]
+        self.weapons = [Weapon(self), Shotgun(self), GranadeLauncher(self), Rocket(self), MachineGun(self), Sniper(self)]
         
         Game.players[self.id] = self
         
     def update(self):
+        if self.hp <= 0:
+            self.hp = 0
+            self.toRemove = True
+            
         if self.w:
             self.vy = -self.max_speed
         elif self.s:
@@ -38,14 +44,19 @@ class Player(ColisionEntity):
         
         # Check colision with other ColisionEntities.
         for i in Game.npcs:
-            self.check_colision(Game.npcs[i])
+            self.check_colision_repel(Game.npcs[i])
             
+        # Check for colision with items
+        for i in Game.dropped_items:
+            item = Game.dropped_items[i]
+            if self.check_colision(self.id, item):
+                self.addItem(item)
+                socketio.emit("item_grab", item.init_json(), namespace="/game")
+                # Remove item from view
+                item.toRemove = True
+        
         if self.attackPressed:
             self.shootBullet(self.mouseAngle)
-            
-        if self.hp <= 0:
-            self.hp = 0
-            self.toRemove = True    
     
     def switch_weapon(self, weapon_number):
         if len(self.weapons) >= weapon_number:
