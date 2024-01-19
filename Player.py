@@ -5,7 +5,7 @@ from Weapon import Weapon, Shotgun, GranadeLauncher, Rocket, MachineGun, Sniper
 from Entity import EntityWithItems
 
 class Player(EntityWithItems):
-    def __init__(self, id, x, y, size) -> None:
+    def __init__(self, id, name, x, y, size) -> None:
         super().__init__(id, x, y, 0, 0, size=size)
         self.w = False
         self.d = False
@@ -16,8 +16,11 @@ class Player(EntityWithItems):
         self.hp = 10
         self.maxHp = 10
         self.score = 0
+        
         self.current_weapon = 0
         self.weapons = [Weapon(self), Shotgun(self), GranadeLauncher(self), Rocket(self), MachineGun(self), Sniper(self)]
+        
+        self.name = name
         
         Game.players[self.id] = self
         
@@ -67,7 +70,7 @@ class Player(EntityWithItems):
     
     def init_json(self):
         entity_json = super().toJson()
-        player_json = {"maxHp":self.maxHp, "size":self.size, "hp":self.hp, "score": self.score}
+        player_json = {"maxHp":self.maxHp, "size":self.size, "hp":self.hp, "score": self.score, "name":self.name}
         entity_json.update(player_json)
         return entity_json
         

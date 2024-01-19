@@ -123,9 +123,10 @@ class Game(Namespace):
             time.sleep(0.04)
 
 
-    def on_connect(self, data):
+    def on_start_game(self, name):
+        
         from Player import Player
-        Player(request.sid, 0,0, 50)
+        Player(request.sid, name, 0,0, 50)
         emit("player_connected", Game.players[request.sid].init_json(), broadcast=True, include_self=False)
         game_data = {
             "playerid":request.sid,

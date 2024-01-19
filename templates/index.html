@@ -13,24 +13,40 @@
     <link rel="shortcut icon" href="{{ url_for('static', filename='favicon.ico') }}">
     <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
     <script type="text/javascript" src="{{url_for('static',filename='code.js')}}" defer></script>
-    <script src="https://cdn.socket.io/4.7.2/socket.io.min.js" integrity="sha384-mZLF4UVrpi/QTWPA7BjNPEnkIfRFn4ZEO3Qt/HFklTJBj/gBOV8G3HcKn4NfQblz" crossorigin="anonymous"></script>
+    <script src="https://cdn.socket.io/4.7.2/socket.io.min.js"
+        integrity="sha384-mZLF4UVrpi/QTWPA7BjNPEnkIfRFn4ZEO3Qt/HFklTJBj/gBOV8G3HcKn4NfQblz"
+        crossorigin="anonymous"></script>
 </head>
 
 <body>
-    <canvas id="canvas" style="position: absolute;">
-        Tu navegador no admite el elemento &lt;canvas&gt;.
-    </canvas>
-    <canvas id="canvasui" style="position: absolute;">
-        Tu navegador no admite el elemento &lt;canvas&gt;.
-    </canvas>
-    <div class="ui_button_bar" id="items">
-        <div class="flex_expanded">
-            <input id="weapon_1" class="ui_weapon" type="image" title="Pistol" src="{{url_for('static',filename='weapons_svg/pistol-gun.svg')}}" />
-            <input id="weapon_2" class="ui_weapon" type="image" title="Shotgun" src="{{url_for('static',filename='weapons_svg/shotgun-rounds.svg')}}" />
-            <input id="weapon_3" class="ui_weapon" type="image" title="Bomb" src="{{url_for('static',filename='weapons_svg/cluster-bomb.svg')}}" />
-            <input id="weapon_4" class="ui_weapon" type="image" title="Rocket" src="{{url_for('static',filename='weapons_svg/rocket.svg')}}" />
-            <input id="weapon_5" class="ui_weapon" type="image" title="Uzi" src="{{url_for('static',filename='weapons_svg/uzi.svg')}}" />
-            <input id="weapon_6" class="ui_weapon" type="image" title="Winchester" src="{{url_for('static',filename='weapons_svg/winchester-rifle.svg')}}" />
+    <div id="start">
+        <h1>Another Shooter Game</h1>
+        <label for="player_name">Player name:</label>
+        <input type="text" id="player_name" name="player_name">
+        <button id="begin">Begin</button>
+    </div>
+    <div id="game" style="display: none;">
+        <canvas id="canvas" style="position: absolute;">
+            Tu navegador no admite el elemento &lt;canvas&gt;.
+        </canvas>
+        <canvas id="canvasui" style="position: absolute;">
+            Tu navegador no admite el elemento &lt;canvas&gt;.
+        </canvas>
+        <div class="ui_button_bar" id="items">
+            <div class="flex_expanded">
+                <input id="weapon_1" class="ui_weapon" type="image" title="Pistol"
+                    src="{{url_for('static',filename='weapons_svg/pistol-gun.svg')}}" />
+                <input id="weapon_2" class="ui_weapon" type="image" title="Shotgun"
+                    src="{{url_for('static',filename='weapons_svg/shotgun-rounds.svg')}}" />
+                <input id="weapon_3" class="ui_weapon" type="image" title="Bomb"
+                    src="{{url_for('static',filename='weapons_svg/cluster-bomb.svg')}}" />
+                <input id="weapon_4" class="ui_weapon" type="image" title="Rocket"
+                    src="{{url_for('static',filename='weapons_svg/rocket.svg')}}" />
+                <input id="weapon_5" class="ui_weapon" type="image" title="Uzi"
+                    src="{{url_for('static',filename='weapons_svg/uzi.svg')}}" />
+                <input id="weapon_6" class="ui_weapon" type="image" title="Winchester"
+                    src="{{url_for('static',filename='weapons_svg/winchester-rifle.svg')}}" />
+            </div>
         </div>
     </div>
 </body>
