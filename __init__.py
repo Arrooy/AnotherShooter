@@ -94,7 +94,7 @@ class Game(Namespace):
                     Game.once = False
                 """
                 from Item import HealingPotion
-                if random() < 0.01:
+                if random() < 0.05:
                     print("Creating Mob")
                     x,y = Game.generate_empty_coords(0,0,50,50)
                     npc = NPC(random(), x, y, 10, 1, attack_speed=500,size=50)
