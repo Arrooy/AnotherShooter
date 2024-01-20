@@ -15,7 +15,14 @@ class Entity():
     def update(self):
         self.x = self.x + self.vx
         self.y = self.y + self.vy
-
+        
+        # Hard stops of the world.
+        if self.x < -1000 or self.x > 1000:
+            self.x = self.x - self.vx
+            
+        if self.y < -1000 or self.y > 1000:
+            self.y = self.y - self.vy
+        
     def getDistance(self, pt):
         return math.sqrt(math.pow(self.x - pt.x, 2) + math.pow(self.y - pt.y, 2))
     

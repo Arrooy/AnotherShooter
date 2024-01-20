@@ -48,8 +48,7 @@ class Game(Namespace):
     npcs = {}
     dropped_items = {}
     new_stuff = {}
-    
-    once = True
+
     def update_list(list_id, dictionary, to_remove):
         for id in list(dictionary.keys()):
             item = dictionary[id]
@@ -60,7 +59,7 @@ class Game(Namespace):
                 del dictionary[id]
     
     def generate_empty_coords(spawn_x, spawn_y, area, size, iterations=0):
-        if iterations > 4:
+        if iterations >= 1:
             area = area + size
             
         x = spawn_x + random() * area - area/2 
@@ -69,39 +68,27 @@ class Game(Namespace):
         for i in Game.npcs:
             npc = Game.npcs[i]
             if npc.getDistancexy(x,y) < npc.size/2+size/2:
-                x,y = Game.generate_empty_coords(spawn_x, spawn_x, area, size, iterations+1)
+                x,y = Game.generate_empty_coords(spawn_x, spawn_y, area, size, iterations+1)
         
         for i in Game.players:
             player = Game.players[i]
             if player.getDistancexy(x,y) < player.size/2+size/2:
-                x,y = Game.generate_empty_coords(spawn_x, spawn_x, area, size, iterations+1)
+                x,y = Game.generate_empty_coords(spawn_x, spawn_y, area, size, iterations+1)
         
         return x,y
         
     def thread_function(sock):
+        from SpawningPool import SpawningPool
+        spawning_pool = SpawningPool(500, 0, 50, Game.npcs)
         
-        from NPC import NPC
         while True:
             while len(Game.players) == 0:
                 time.sleep(0.5)
             #try:
             if True:
-                """
-                if Game.once:
-                    from Item import HealingPotion
-                    npc = NPC(random(), 100, 100, 10, 1, attack_speed=500,size=50)
-                    npc.addItem(HealingPotion(npc))
-                    Game.once = False
-                """
-                from Item import HealingPotion
-                if random() < 0.05:
-                    print("Creating Mob")
-                    x,y = Game.generate_empty_coords(0,0,50,50)
-                    npc = NPC(random(), x, y, 10, 1, attack_speed=500,size=50)
-                    npc.addItem(HealingPotion(npc))
-                    
+                             
+                spawning_pool.update()
                 
-                                
                 to_remove = {"players":[], "bullets":[], "npcs":[], "dropped_items":[]}            
                 
                 # Update game and check for any entity that needs to be removed.
@@ -147,7 +134,7 @@ class Game(Namespace):
     def on_start_game(self, name):
         
         from Player import Player
-        x,y = Game.generate_empty_coords(0,0,50,50)
+        x,y = Game.generate_empty_coords(-500,0,50,50)
         Player(request.sid, name, x, y, 50)
         emit("player_connected", Game.players[request.sid].init_json(), broadcast=True, include_self=False)
         game_data = {

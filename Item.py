@@ -7,7 +7,7 @@ class Item(ColisionEntity):
         self.carrier = carrier
         self.name = name
         self.timer = 0
-        self.droptime = 100
+        self.droptime = 200
         self.active_function = active_function
         self.parent = None
         

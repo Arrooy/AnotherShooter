@@ -52,7 +52,9 @@ class Player(EntityWithItems):
         # Check for colision with items
         for i in Game.dropped_items:
             item = Game.dropped_items[i]
+            
             if self.check_colision(self.id, item):
+                print("item colision ", item.id, Game.dropped_items)
                 self.addItem(item)
                 socketio.emit("item_grab", item.init_json(), namespace="/game")
                 # Remove item from view

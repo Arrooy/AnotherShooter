@@ -184,10 +184,12 @@ class Item extends Entity {
 class Game {
 
     static drawMap() {
-        let x = - players[mysocketid].x
-        let y = - players[mysocketid].y
+        
+        let x = -1000 - players[mysocketid].x + htmlCanvas.width / 2;
+        let y = -1000 - players[mysocketid].y + htmlCanvas.height / 2;
+
         ctx.fillStyle = "yellow"
-        ctx.fillRect(x, y, htmlCanvas.width, htmlCanvas.height);
+        ctx.fillRect(x, y, 2000, 2000);
     }
 
     static drawEntities() {
@@ -299,12 +301,21 @@ class World {
     static gameOverScreen() {
         document.getElementById("start").style.display = "block";
         document.getElementById("game").style.display = "none";
+        
+        let itemsHtml = document.getElementById("items");
+        let buttons = itemsHtml.children;
+        for (var i = 0; i < buttons.length; i++) {
+            buttons[i].remove();
+        }
 
         // Remove elements from game.
         players = {};
         bullets = {};
         npcs = {};
         dropped_items = {};
+        
+        // Fuk it
+        window.location.reload();
     }
 
     static start_screen() {
