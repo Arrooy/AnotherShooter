@@ -262,7 +262,6 @@ class World {
             else if (e.code === "KeyS") socket.emit('keypress', { inputId: "s", state: true });
             else if (e.code === "KeyA") socket.emit('keypress', { inputId: "a", state: true });
             else if (e.code === "KeyD") socket.emit('keypress', { inputId: "d", state: true });
-            else if (e.code === "Space") socket.emit('keypress', { inputId: "attack", state: true });
             else if (e.code === "Digit1") socket.emit('keypress', { inputId: "switch_weapon", state: 1 })
             else if (e.code === "Digit2") socket.emit('keypress', { inputId: "switch_weapon", state: 2 })
             else if (e.code === "Digit3") socket.emit('keypress', { inputId: "switch_weapon", state: 3 })
@@ -271,6 +270,19 @@ class World {
             else if (e.code === "Digit6") socket.emit('keypress', { inputId: "switch_weapon", state: 6 })
         });
         
+        document.addEventListener("mousedown", () => {
+            if (players[mysocketid] === undefined)
+                return;
+            
+            socket.emit('keypress', { inputId: "attack", state: true });
+        })
+        
+        document.addEventListener("mouseup", () => {
+            if (players[mysocketid] === undefined)
+                return;
+            
+            socket.emit('keypress', { inputId: "attack", state: false });
+        })
         
         document.addEventListener("mousemove", (e) => {
             if (players[mysocketid] === undefined)
