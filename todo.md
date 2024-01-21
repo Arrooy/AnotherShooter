@@ -1,1 +1,0 @@
-Items con efecto de duracion limitada.

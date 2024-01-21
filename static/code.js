@@ -13,9 +13,11 @@ let players = {};
 let bullets = {};
 let npcs = {};
 let dropped_items = {};
-
 let mysocketid;
 
+const background_image = new Image();
+background_image.src = "static/background1.png";
+    
 
 class Entity {
     constructor(initPack) {
@@ -54,8 +56,11 @@ class ColisionEntity extends Entity {
         let hpx = x - hpmw / 2;
         let hpy = y - this.size - hph - 10;
 
+        ctx.strokeStyle = "black"
         ctx.fillStyle = "red";
         ctx.fillRect(hpx, hpy, hpmw, hph);
+        ctx.strokeRect(hpx, hpy, hpmw+1, hph+1)
+
         ctx.fillStyle = "green";
         ctx.fillRect(hpx, hpy, hpWidth, hph)
     }
@@ -66,6 +71,7 @@ class Player extends ColisionEntity {
         super(initPack);
         this.angle = 0;
         this.score = 0;
+        this.money = 0;
         this.name = initPack.name;
         players[this.id] = this;
     }
@@ -112,8 +118,11 @@ class Player extends ColisionEntity {
         let ny = -height / 2;
         ctx.fillStyle = "blue";
         ctx.fillRect(nx, ny, width, height);
+        ctx.strokeRect(nx, ny, width, height);
+
         ctx.fillStyle = "blue";
         ctx.fillRect(nx + width - 1, ny + height / 2 - 10, 20, 20)
+        ctx.strokeRect(nx + width - 1, ny + height / 2 - 10, 20, 20);
 
 
         // restore the context to its untranslated/unrotated state
@@ -141,7 +150,7 @@ class NPC extends ColisionEntity {
 
         ctx.fillStyle = "brown";
         ctx.fillRect(x - this.size / 2, y - this.size / 2, this.size, this.size);
-
+        ctx.strokeRect(x - this.size / 2, y - this.size / 2, this.size, this.size);
     }
 }
 
@@ -163,12 +172,14 @@ class Bullet extends Entity {
 
         ctx.fillStyle = "red";
         ctx.fillRect(x - this.size / 2, y - this.size / 2, this.size, this.size);
+        ctx.strokeRect(x - this.size / 2, y - this.size / 2, this.size, this.size);
     }
 }
 
 class Item extends Entity {
     constructor(initPack) {
         super(initPack);
+        this.color = initPack.color;
         dropped_items[this.id] = this;
     }
 
@@ -177,19 +188,31 @@ class Item extends Entity {
         let y = this.y - players[mysocketid].y + htmlCanvas.height / 2;
 
 
-        ctx.fillStyle = "green";
+        ctx.fillStyle = this.color;
         ctx.fillRect(x - this.size / 2, y - this.size / 2, this.size, this.size);
+        ctx.strokeRect(x - this.size / 2, y - this.size / 2, this.size, this.size);
     }
 }
 class Game {
 
     static drawMap() {
+        const game_width = 2000
+        const game_height = 2000
         
-        let x = -1000 - players[mysocketid].x + htmlCanvas.width / 2;
-        let y = -1000 - players[mysocketid].y + htmlCanvas.height / 2;
-
-        ctx.fillStyle = "yellow"
-        ctx.fillRect(x, y, 2000, 2000);
+        let x = -game_width/2 - players[mysocketid].x + htmlCanvas.width / 2;
+        let y = -game_height/2 - players[mysocketid].y + htmlCanvas.height / 2;
+        
+        const tile_width = 499;
+        const tile_height = 499;
+        for(let i = 0; i < Math.ceil(game_width / tile_width) - 1; i++) {
+            for (let h = 0; h < Math.ceil(game_height / tile_height - 1); h++) 
+            {
+                ctx.drawImage(background_image, x + i * tile_width, y + h * tile_height);        
+            }   
+        }
+        
+        ctx.strokeStyle = "slategrey";
+        ctx.strokeRect(x, y, 2000, 2000);
     }
 
     static drawEntities() {
@@ -216,25 +239,33 @@ class UI {
 
     static draw() {
         
-        Score.drawScore();
+        UIStats.drawScore();
     }
 }
 
-class Score {
+class UIStats {
 
     constructor() {
         this.lastScore = -1;
+        this.lastMoney = -1;
     }
 
     static drawScore() {
         let score = players[mysocketid].score;
+        let money = players[mysocketid].money;
 
-        if (this.lastScore === score)
+        if (this.lastScore === score && this.lastMoney == money)
             return
+
         ctxUi.clearRect(0, 0, htmlCanvas.width, htmlCanvas.height);
         this.lastScore = score;
         ctxUi.font = "48px serif";
         ctxUi.fillText("Kills: " + score, 10, 50);
+        
+        this.lastMoney = money;
+        ctxUi.font = "48px serif";
+        ctxUi.fillText("Cash: " + money, 10, 100);
+        
     }
 }
 
@@ -360,7 +391,8 @@ class World {
 
         htmlCanvasUi.width = window.innerWidth;
         htmlCanvasUi.height = window.innerHeight;
-        Score.lastScore = -1;
+        UIStats.lastScore = -1;
+        UIStats.lastMoney = -1;
 
         this.draw();
     }
@@ -445,6 +477,10 @@ class World {
 
                         if (playerData.hp !== undefined) {
                             p.hp = playerData.hp;
+                        }
+                        
+                        if (playerData.money !== undefined) {
+                            p.money = playerData.money;
                         }
 
                     }

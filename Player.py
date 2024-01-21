@@ -15,7 +15,9 @@ class Player(EntityWithItems):
         self.mouseAngle = 0
         self.hp = 10
         self.maxHp = 10
+        
         self.score = 0
+        self.money = 0
         
         self.current_weapon = 0
         self.weapons = [Weapon(self), Shotgun(self), GranadeLauncher(self), Rocket(self), MachineGun(self), Sniper(self)]
@@ -82,6 +84,6 @@ class Player(EntityWithItems):
         
     def update_json(self):
         entity_json = super().toJson()
-        player_json = {"hp":self.hp, "score": self.score}
+        player_json = {"hp":self.hp, "score": self.score, "money": self.money}
         entity_json.update(player_json)
         return entity_json

@@ -79,7 +79,7 @@ class Game(Namespace):
         
     def thread_function(sock):
         from SpawningPool import SpawningPool
-        spawning_pool = SpawningPool(500, 0, 1, Game.npcs)
+        spawning_pool = SpawningPool(500, 0, 50, Game.npcs)
         
         while True:
             while len(Game.players) == 0:

@@ -3,7 +3,7 @@ import random
 import time
 
 class Item(ColisionEntity):
-    def __init__(self, name, carrier, active_function, effect_time=0, deactivation_function=None) -> None:
+    def __init__(self, name, carrier, active_function, effect_time=0, deactivation_function=None, color="green") -> None:
         super().__init__(random.random(), carrier.x, carrier.y, 0, 0, 0, size=20)
         self.carrier = carrier
         self.name = name
@@ -11,6 +11,8 @@ class Item(ColisionEntity):
         self.droptime = 200
         self.active_function = active_function
         self.parent = None
+        
+        self.color = color
         
         self.activated = False
         self.has_effect = effect_time != 0
@@ -40,13 +42,13 @@ class Item(ColisionEntity):
     
     def init_json(self):
         colision_entity_json = super().init_json()
-        item_json = {"name":self.name}
+        item_json = {"name":self.name, "color":self.color}
         colision_entity_json.update(item_json)
         return colision_entity_json
 
 class HealingPotion(Item):
     def __init__(self, carrier) -> None:
-        super().__init__("Healing Potion", carrier, self.heal)
+        super().__init__("Healing Potion", carrier, self.heal, color="green")
     
     def heal(self, parent):
         if parent is not None:
@@ -54,15 +56,15 @@ class HealingPotion(Item):
 
 class BigCashStack(Item):
     def __init__(self, carrier) -> None:
-        super().__init__("Big cash stack", carrier, self.money)
+        super().__init__("Big cash stack", carrier, self.money, color="gold")
     
     def money(self, parent):
         if parent is not None:
-            parent.score += 5
+            parent.money += 5
             
 class SpeedPotion(Item):
     def __init__(self, carrier) -> None:
-        super().__init__("Speed potion", carrier, self.speed, 5000, self.de_activate)
+        super().__init__("Speed potion", carrier, self.speed, 5000, self.de_activate, color="silver")
   
     def speed(self, parent):
         if parent is not None:
