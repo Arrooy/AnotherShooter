@@ -1,8 +1,9 @@
 from Entity import ColisionEntity
 import random
+import time
 
 class Item(ColisionEntity):
-    def __init__(self, name, carrier, active_function) -> None:
+    def __init__(self, name, carrier, active_function, effect_time=0, deactivation_function=None) -> None:
         super().__init__(random.random(), carrier.x, carrier.y, 0, 0, 0, size=20)
         self.carrier = carrier
         self.name = name
@@ -10,6 +11,12 @@ class Item(ColisionEntity):
         self.droptime = 200
         self.active_function = active_function
         self.parent = None
+        
+        self.activated = False
+        self.has_effect = effect_time != 0
+        self.effect_time = effect_time
+        self.effect_counter = 0
+        self.deactivation_function = deactivation_function
         
     def update(self):
                     
@@ -22,8 +29,14 @@ class Item(ColisionEntity):
         self.carrier = parent
         
     def activate(self):
+        self.activated = True
         self.active_function(self.parent)
-        self.parent.consume_item(self)
+        if self.has_effect and time.time_ns() - self.effect_counter >= 1_000_000 * self.effect_time:
+            print("Consuming")
+            self.deactivation_function(self.parent)
+            self.parent.consume_item(self)
+        elif not self.has_effect:
+            self.parent.consume_item(self)
     
     def init_json(self):
         colision_entity_json = super().init_json()
@@ -47,3 +60,13 @@ class BigCashStack(Item):
         if parent is not None:
             parent.score += 5
             
+class SpeedPotion(Item):
+    def __init__(self, carrier) -> None:
+        super().__init__("Speed potion", carrier, self.speed, 5000, self.de_activate)
+  
+    def speed(self, parent):
+        if parent is not None:
+            parent.max_speed = parent.original_max_speed * 2
+            
+    def de_activate(self, parent):
+        parent.max_speed = parent.original_max_speed

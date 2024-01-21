@@ -1,4 +1,5 @@
 import math
+import time
 from __init__ import Game
 from random import random
 
@@ -10,6 +11,7 @@ class Entity():
         self.vx = vx
         self.vy = vy
         self.max_speed = max_speed
+        self.original_max_speed = max_speed
         self.toRemove = False
     
     def update(self):
@@ -100,7 +102,7 @@ class EntityWithItems(ColisionEntity):
             Game.new_stuff["dropped_items"][item] = item
     
     def generate_empty_coords(self, spawn_x, spawn_y, area, size, iterations=0):
-        if iterations > 4:
+        if iterations > 1:
             area = area + size
             
         x = spawn_x + random() * area - area/2 
@@ -109,7 +111,7 @@ class EntityWithItems(ColisionEntity):
         for i in Game.dropped_items:
             item = Game.dropped_items[i]
             if item.getDistancexy(x,y) < item.size/2+size/2:
-                x,y = self.generate_empty_coords(spawn_x, spawn_x, area, size, iterations+1)
+                x,y = self.generate_empty_coords(spawn_x, spawn_y, area, size, iterations+1)
         
         return x,y
     
@@ -117,4 +119,6 @@ class EntityWithItems(ColisionEntity):
         print("Activating item", id)
         print("My Items are", self.items)
         #if id in self.items:
+        self.items[id].effect_counter = time.time_ns()
         self.items[id].activate()
+            

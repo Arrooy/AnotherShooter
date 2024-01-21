@@ -1,6 +1,6 @@
 import time
 
-from Item import HealingPotion, BigCashStack
+from Item import HealingPotion, BigCashStack, SpeedPotion
 from NPC import NPC
 from random import random
 from __init__ import Game
@@ -31,3 +31,4 @@ class SpawningPool():
             elif magic_number > 3 and magic_number <= 5:
                 npc.addItem(BigCashStack(npc))
             
+            npc.addItem(SpeedPotion(npc))
