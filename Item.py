@@ -67,7 +67,7 @@ class BigCashStack(Item):
             
 class SpeedPotion(Item):
     def __init__(self, carrier) -> None:
-        super().__init__("Speed potion", carrier, self.speed, 5000, self.de_activate, color="silver")
+        super().__init__("Speed potion", carrier, self.speed, manual_activation=True, effect_time=5000, deactivation_function=self.de_activate, color="silver")
   
     def speed(self, parent):
         if parent is not None:
