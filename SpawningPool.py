@@ -31,7 +31,7 @@ class SpawningPool():
             
             magic_number = int(random() * 10)
             if magic_number <= 3:
-                npc.addItem(BigCashStack(npc))
+                npc.addItem(BigCashStack(npc, 5))
             
             magic_number = int(random() * 10)
             if magic_number <= 3:

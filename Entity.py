@@ -93,7 +93,8 @@ class EntityWithItems(ColisionEntity):
             x,y = self.generate_empty_coords(item.carrier.x, item.carrier.y, item.size*2 ,item.size)
             item.x = x
             item.y = y
-            print("Adding item at ",x,"",y)
+            item.timer = 0
+            item.toRemove = False
             Game.dropped_items[item.id] = item
             
             if "dropped_items" not in Game.new_stuff:
@@ -116,7 +117,7 @@ class EntityWithItems(ColisionEntity):
         return x,y
     
     def use_item(self, id):
-        print("Activating item", id)
+        print("Activating item", id, " ", self.items[id].name)
         print("My Items are", self.items)
         #if id in self.items:
         self.items[id].effect_counter = time.time_ns()

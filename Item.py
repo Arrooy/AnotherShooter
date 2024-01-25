@@ -3,7 +3,7 @@ import random
 import time
 
 class Item(ColisionEntity):
-    def __init__(self, name, carrier, active_function, effect_time=0, deactivation_function=None, color="green") -> None:
+    def __init__(self, name, carrier, active_function, manual_activation=True, effect_time=0, deactivation_function=None, color="green") -> None:
         super().__init__(random.random(), carrier.x, carrier.y, 0, 0, 0, size=20)
         self.carrier = carrier
         self.name = name
@@ -13,6 +13,8 @@ class Item(ColisionEntity):
         self.parent = None
         
         self.color = color
+        
+        self.manual_activation = manual_activation
         
         self.activated = False
         self.has_effect = effect_time != 0
@@ -24,6 +26,7 @@ class Item(ColisionEntity):
                     
         self.timer+=1
         if self.timer > self.droptime:
+            print("removing item ", self.id)
             self.toRemove = True
     
     def pick_up(self, parent):
@@ -54,12 +57,13 @@ class HealingPotion(Item):
             parent.hp = parent.maxHp
 
 class BigCashStack(Item):
-    def __init__(self, carrier) -> None:
-        super().__init__("Big cash stack", carrier, self.money, color="gold")
-    
+    def __init__(self, carrier, amount) -> None:
+        super().__init__("Big cash stack", carrier, self.money, manual_activation=False, color="gold")
+        self.amount = amount
+        
     def money(self, parent):
         if parent is not None:
-            parent.money += 5
+            parent.money += self.amount
             
 class SpeedPotion(Item):
     def __init__(self, carrier) -> None:
