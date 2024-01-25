@@ -34,7 +34,6 @@ class Item(ColisionEntity):
         self.activated = True
         self.active_function(self.parent)
         if self.has_effect and time.time_ns() - self.effect_counter >= 1_000_000 * self.effect_time:
-            print("Consuming")
             self.deactivation_function(self.parent)
             self.parent.consume_item(self)
         elif not self.has_effect:

@@ -15,9 +15,13 @@ let npcs = {};
 let dropped_items = {};
 let mysocketid;
 
+let world_x = 0;
+let world_y = 0;
+
 const background_image = new Image();
 background_image.src = "static/background1.png";
-    
+
+const isMobile = /iPhone|iPad|iPod|Android/i.test(navigator.userAgent);
 
 class Entity {
     constructor(initPack) {
@@ -59,8 +63,7 @@ class ColisionEntity extends Entity {
         ctx.strokeStyle = "black"
         ctx.fillStyle = "red";
         ctx.fillRect(hpx, hpy, hpmw, hph);
-        ctx.strokeRect(hpx, hpy, hpmw+1, hph+1)
-
+        ctx.strokeRect(hpx, hpy, hpmw + 1, hph + 1)
         ctx.fillStyle = "green";
         ctx.fillRect(hpx, hpy, hpWidth, hph)
     }
@@ -82,8 +85,14 @@ class Player extends ColisionEntity {
 
     draw() {
 
-        let x = this.x - players[mysocketid].x + htmlCanvas.width / 2;
-        let y = this.y - players[mysocketid].y + htmlCanvas.height / 2;
+        let x, y;
+        if (!isMobile) {
+            x = this.x - players[mysocketid].x + htmlCanvas.width / 2;
+            y = this.y - players[mysocketid].y + htmlCanvas.height / 2;
+        } else {
+            x = world_x + this.x;
+            y = world_y + this.y;
+        }
 
         super.drawHpBar(x, y);
 
@@ -91,7 +100,7 @@ class Player extends ColisionEntity {
         ctx.font = "16px serif";
         ctx.textAlign = "center";
         ctx.fillText(this.name, x, y - 40);
-        
+
         this.drawRotatedPlayer(x, y);
     }
 
@@ -142,10 +151,14 @@ class NPC extends ColisionEntity {
     }
 
     draw() {
-
-        let x = this.x - players[mysocketid].x + htmlCanvas.width / 2;
-        let y = this.y - players[mysocketid].y + htmlCanvas.height / 2;
-
+        let x, y;
+        if (!isMobile) {
+            x = this.x - players[mysocketid].x + htmlCanvas.width / 2;
+            y = this.y - players[mysocketid].y + htmlCanvas.height / 2;
+        } else {
+            x = world_x + this.x;
+            y = world_y + this.y;
+        }
         super.drawHpBar(x, y);
 
         ctx.fillStyle = "brown";
@@ -166,9 +179,14 @@ class Bullet extends Entity {
 
     draw() {
 
-        let x = this.x - players[mysocketid].x + htmlCanvas.width / 2;
-        let y = this.y - players[mysocketid].y + htmlCanvas.height / 2;
-
+        let x, y;
+        if (!isMobile) {
+            x = this.x - players[mysocketid].x + htmlCanvas.width / 2;
+            y = this.y - players[mysocketid].y + htmlCanvas.height / 2;
+        } else {
+            x = world_x + this.x;
+            y = world_y + this.y;
+        }
 
         ctx.fillStyle = "red";
         ctx.fillRect(x - this.size / 2, y - this.size / 2, this.size, this.size);
@@ -184,9 +202,14 @@ class Item extends Entity {
     }
 
     draw() {
-        let x = this.x - players[mysocketid].x + htmlCanvas.width / 2;
-        let y = this.y - players[mysocketid].y + htmlCanvas.height / 2;
-
+        let x, y;
+        if (!isMobile) {
+            x = this.x - players[mysocketid].x + htmlCanvas.width / 2;
+            y = this.y - players[mysocketid].y + htmlCanvas.height / 2;
+        } else {
+            x = world_x + this.x;
+            y = world_y + this.y;
+        }
 
         ctx.fillStyle = this.color;
         ctx.fillRect(x - this.size / 2, y - this.size / 2, this.size, this.size);
@@ -198,19 +221,22 @@ class Game {
     static drawMap() {
         const game_width = 2000
         const game_height = 2000
-        
-        let x = -game_width/2 - players[mysocketid].x + htmlCanvas.width / 2;
-        let y = -game_height/2 - players[mysocketid].y + htmlCanvas.height / 2;
-        
+        let x, y;
+        if (!isMobile) {
+            x = -game_width / 2 - players[mysocketid].x + htmlCanvas.width / 2;
+            y = -game_height / 2 - players[mysocketid].y + htmlCanvas.height / 2;
+        } else {
+            x = world_x - game_width / 2 + htmlCanvas.width / 2;
+            y = world_y - game_height / 2 + htmlCanvas.height / 2;
+        }
         const tile_width = 499;
         const tile_height = 499;
-        for(let i = 0; i < Math.ceil(game_width / tile_width) - 1; i++) {
-            for (let h = 0; h < Math.ceil(game_height / tile_height - 1); h++) 
-            {
-                ctx.drawImage(background_image, x + i * tile_width, y + h * tile_height);        
-            }   
+        for (let i = 0; i < Math.ceil(game_width / tile_width) - 1; i++) {
+            for (let h = 0; h < Math.ceil(game_height / tile_height - 1); h++) {
+                ctx.drawImage(background_image, x + i * tile_width, y + h * tile_height);
+            }
         }
-        
+
         ctx.strokeStyle = "slategrey";
         ctx.strokeRect(x, y, 2000, 2000);
     }
@@ -238,7 +264,7 @@ class Game {
 class UI {
 
     static draw() {
-        
+
         UIStats.drawScore();
     }
 }
@@ -261,21 +287,26 @@ class UIStats {
         this.lastScore = score;
         ctxUi.font = "48px serif";
         ctxUi.fillText("Kills: " + score, 10, 50);
-        
+
         this.lastMoney = money;
         ctxUi.font = "48px serif";
         ctxUi.fillText("Cash: " + money, 10, 100);
-        
+
     }
 }
 
 class World {
 
     static attachToEvents() {
+
         window.addEventListener('resize', function () {
             World.resize();
         }, false);
-        
+
+        if (isMobile) {
+            return;
+        }
+
         document.addEventListener('keyup', (e) => {
             if (players[mysocketid] === undefined)
                 return;
@@ -286,7 +317,7 @@ class World {
             else if (e.code === "KeyD") socket.emit('keypress', { inputId: "d", state: false });
             else if (e.code === "Space") socket.emit('keypress', { inputId: "attack", state: false });
         });
-        
+
         document.addEventListener('keydown', (e) => {
             if (players[mysocketid] === undefined)
                 return;
@@ -302,25 +333,25 @@ class World {
             else if (e.code === "Digit5") socket.emit('keypress', { inputId: "switch_weapon", state: 5 })
             else if (e.code === "Digit6") socket.emit('keypress', { inputId: "switch_weapon", state: 6 })
         });
-        
+
         document.addEventListener("mousedown", () => {
             if (players[mysocketid] === undefined)
                 return;
-            
+
             socket.emit('keypress', { inputId: "attack", state: true });
         })
-        
+
         document.addEventListener("mouseup", () => {
             if (players[mysocketid] === undefined)
                 return;
-            
+
             socket.emit('keypress', { inputId: "attack", state: false });
         })
-        
+
         document.addEventListener("mousemove", (e) => {
             if (players[mysocketid] === undefined)
                 return;
-        
+
             let x = -htmlCanvas.width / 2 + e.clientX
             let y = -htmlCanvas.height / 2 + e.clientY
             let angle = (Math.atan2(y, x) / Math.PI) * 180.0;
@@ -332,7 +363,7 @@ class World {
     static gameOverScreen() {
         document.getElementById("start").style.display = "block";
         document.getElementById("game").style.display = "none";
-        
+
         let itemsHtml = document.getElementById("items");
         let buttons = itemsHtml.children;
         for (var i = 0; i < buttons.length; i++) {
@@ -344,7 +375,7 @@ class World {
         bullets = {};
         npcs = {};
         dropped_items = {};
-        
+
         // Fuk it
         window.location.reload();
     }
@@ -355,10 +386,14 @@ class World {
             socket = io("/game");
             World.connect_socket();
             let name = document.getElementById("player_name").value;
-            if (name == ""){
+            if (name == "") {
                 name = Math.random()
             }
-            socket.emit('start_game', name);
+            if (!isMobile) {
+                socket.emit('start_game', name);
+            } else {
+                socket.emit('observer_connected');
+            }
             document.getElementById("start").style.display = "none";
             document.getElementById("game").style.display = "block";
         });
@@ -382,7 +417,9 @@ class World {
         ctx.clearRect(0, 0, htmlCanvas.width, htmlCanvas.height);
         Game.drawMap();
         Game.drawEntities()
-        UI.draw()
+        if (!isMobile) {
+            UI.draw()
+        }
     }
 
     static resize() {
@@ -398,9 +435,11 @@ class World {
     }
 
     static mainLoop() {
-        if (players[mysocketid] === undefined) {
-            World.gameOverScreen()
-            return
+        if (!isMobile) {
+            if (players[mysocketid] === undefined) {
+                World.gameOverScreen()
+                return
+            }
         }
 
         World.update();
@@ -421,7 +460,7 @@ class World {
 
         socket.on("init", function (data) {
             console.log("init", data)
-            
+
             if (data.players) {
                 for (const p of data.players) {
                     new Player(p);
@@ -443,7 +482,7 @@ class World {
                     new Item(i);
                 }
             }
-            
+
             // We got the player id, start the game.
             if (data.playerid) {
                 mysocketid = data.playerid;
@@ -478,7 +517,11 @@ class World {
                         if (playerData.hp !== undefined) {
                             p.hp = playerData.hp;
                         }
-                        
+
+                        if (playerData.angle !== undefined) {
+                            p.angle = playerData.angle;
+                        }
+
                         if (playerData.money !== undefined) {
                             p.money = playerData.money;
                         }
@@ -567,3 +610,39 @@ class World {
 }
 
 World.start_screen();
+
+if (isMobile) {
+
+    // Android
+    document.addEventListener('touchstart', handleTouchStart, false);
+    document.addEventListener('touchmove', handleTouchMove, false);
+
+    var xDown = null;
+    var yDown = null;
+    var xUp = 0;
+    var yUp = 0;
+    function getTouches(evt) {
+        return evt.touches ||             // browser API
+            evt.originalEvent.touches; // jQuery
+    }
+
+    function handleTouchStart(evt) {
+        const firstTouch = getTouches(evt)[0];
+        xDown = world_x + firstTouch.clientX;
+        yDown = world_y + firstTouch.clientY;
+    };
+
+    function handleTouchMove(evt) {
+        if (!xDown || !yDown) {
+            return;
+        }
+
+        xUp = evt.touches[0].clientX;
+        yUp = evt.touches[0].clientY;
+        var xDiff = xDown - xUp;
+        var yDiff = yDown - yUp;
+
+        world_x = xDiff;
+        world_y = yDiff;
+    };
+}

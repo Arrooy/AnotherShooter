@@ -4,6 +4,8 @@ body {
     height: 100%;
     margin: 0;
     padding: 0;
+    overflow-y: hidden; /* Hide vertical scrollbar */
+    overflow-x: hidden; /* Hide horizontal scrollbar */
 }
 
 canvas {
@@ -35,4 +37,11 @@ canvas {
     display: flex;
     width: 100%;
     align-items: start;
+    overflow: hidden;
+}
+
+@media all and (max-width: 815px) {
+    .ui_button_bar{
+        display: none;
+    }
 }

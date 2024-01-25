@@ -62,7 +62,7 @@ class Player(EntityWithItems):
             
             if self.check_colision(self.id, item):
                 self.addItem(item)
-                socketio.emit("item_grab", item.init_json(), namespace="/game")
+                socketio.emit("item_grab", item.init_json(), namespace="/game", to=self.id)
                 # Remove item from view
                 item.toRemove = True
         
@@ -84,6 +84,6 @@ class Player(EntityWithItems):
         
     def update_json(self):
         entity_json = super().toJson()
-        player_json = {"hp":self.hp, "score": self.score, "money": self.money}
+        player_json = {"hp":self.hp, "score": self.score, "money": self.money, "angle": self.mouseAngle}
         entity_json.update(player_json)
         return entity_json

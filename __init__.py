@@ -146,6 +146,16 @@ class Game(Namespace):
         }
         emit("init",game_data)
 
+    def on_observer_connected(self):
+        game_data = {
+            "playerid":request.sid,
+            "players": [Game.players[player].init_json() for player in Game.players],
+            "bullets": [Game.bullets[bullet].update_json() for bullet in Game.bullets],
+            "npcs": [Game.npcs[npc].init_json() for npc in Game.npcs],
+            "dropped_items":[Game.dropped_items[item].init_json() for item in Game.dropped_items],
+        }
+        emit("init",game_data)
+    
     def on_disconnect(self):
         emit("player_disconnected", request.sid, broadcast=True, include_self=False)
         if request.sid in Game.players:
