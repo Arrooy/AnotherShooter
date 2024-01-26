@@ -12,7 +12,16 @@
 
     <link rel="shortcut icon" href="{{ url_for('static', filename='favicon.ico') }}">
     <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
-    <script type="text/javascript" src="{{url_for('static',filename='code.js')}}" defer></script>
+    
+    <script type="text/javascript" src="{{url_for('static',filename='scripts/Entity.js')}}" defer></script>
+    <script type="text/javascript" src="{{url_for('static',filename='scripts/Player.js')}}" defer></script>
+    <script type="text/javascript" src="{{url_for('static',filename='scripts/Item.js')}}" defer></script>
+    <script type="text/javascript" src="{{url_for('static',filename='scripts/Bullet.js')}}" defer></script>
+    <script type="text/javascript" src="{{url_for('static',filename='scripts/NPC.js')}}" defer></script>
+    <script type="text/javascript" src="{{url_for('static',filename='scripts/UI.js')}}" defer></script>
+    <script type="text/javascript" src="{{url_for('static',filename='scripts/Game.js')}}" defer></script>
+    <script type="text/javascript" src="{{url_for('static',filename='scripts/code.js')}}" defer></script>
+    
     <script src="https://cdn.socket.io/4.7.2/socket.io.min.js"
         integrity="sha384-mZLF4UVrpi/QTWPA7BjNPEnkIfRFn4ZEO3Qt/HFklTJBj/gBOV8G3HcKn4NfQblz"
         crossorigin="anonymous"></script>
