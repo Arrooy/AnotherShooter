@@ -286,6 +286,9 @@ class World {
                             npc.hp = npcData.hp;
                         }
 
+                        if (npcData.heading !== undefined) {
+                            npc.angle = npcData.heading;
+                        }
                     }
                 }
             }

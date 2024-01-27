@@ -18,6 +18,8 @@ class NPC(EntityWithItems):
         self.last_state = 0
         self.last_roam = 0
         
+        self.heading = 0
+        
         Game.npcs[self.id] = self
         
         if "npcs" not in Game.new_stuff:
@@ -33,6 +35,8 @@ class NPC(EntityWithItems):
             self.toRemove = True 
             return
         
+        self.heading = math.atan2(self.vy, self.vx) / math.pi * 180.0
+        
         closest_player, distance = self.find_closest_player()
         
         # Add logic here
@@ -43,13 +47,6 @@ class NPC(EntityWithItems):
         if closest_player is not None and self.check_colision_stop(closest_player):
             # Touched a player
             self.attack(closest_player)
-        
-        """
-        for i in Game.players:
-            if self.check_colision_stop(Game.players[i]):
-                # Touched a player
-                self.attack(Game.players[i])      
-        """
         
         # Repel otrher npcs
         for i in Game.npcs:
@@ -125,6 +122,6 @@ class NPC(EntityWithItems):
     
     def update_json(self):
         entity_json = super().toJson()
-        player_json = {"hp":self.hp}
+        player_json = {"hp":self.hp, "heading" : self.heading}
         entity_json.update(player_json)
         return entity_json
