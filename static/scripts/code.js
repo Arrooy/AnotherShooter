@@ -12,6 +12,7 @@ let socket;
 let players = {};
 let bullets = {};
 let npcs = {};
+let walls = {};
 let dropped_items = {};
 let mysocketid;
 
@@ -103,6 +104,7 @@ class World {
         players = {};
         bullets = {};
         npcs = {};
+        walls = {};
         dropped_items = {};
 
         // Fuk it
@@ -211,6 +213,13 @@ class World {
                     new Item(i);
                 }
             }
+
+            if (data.walls){
+                for (const w of data.walls){
+                    new Wall(w);
+                }
+            }
+
 
             // We got the player id, start the game.
             if (data.playerid) {

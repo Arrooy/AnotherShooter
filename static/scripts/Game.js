@@ -26,6 +26,10 @@ class Game {
 
     static drawEntities() {
 
+        for (const wall in walls) {
+            walls[wall].draw();
+        }
+        
         for (const bullet in bullets) {
             bullets[bullet].draw();
         }
@@ -41,5 +45,6 @@ class Game {
         for (const item in dropped_items) {
             dropped_items[item].draw();
         }
+
     }
 }

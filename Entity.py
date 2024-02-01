@@ -3,6 +3,8 @@ import time
 from __init__ import Game
 from random import random
 
+from Wall import Wall
+
 class Entity():
     def __init__(self, id, x, y, vx, vy, max_speed=20) -> None:
         self.id = id
@@ -18,6 +20,12 @@ class Entity():
         self.x = self.x + self.vx
         self.y = self.y + self.vy
         
+        for wall in Game.walls:
+            if wall.is_colliding(self):
+                self.x = self.x - self.vx
+                self.y = self.y - self.vy
+                break
+            
         # Hard stops of the world.
         if self.x < -1000 or self.x > 1000:
             self.x = self.x - self.vx

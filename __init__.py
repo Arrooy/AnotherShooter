@@ -46,6 +46,7 @@ class Game(Namespace):
     players = {}
     bullets = {}
     npcs = {}
+    walls = []
     dropped_items = {}
     new_stuff = {}
 
@@ -79,8 +80,9 @@ class Game(Namespace):
         
     def thread_function(sock):
         from SpawningPool import SpawningPool
-        spawning_pool = SpawningPool(500, 0, 1, Game.npcs)
-        
+        spawning_pool = SpawningPool(500, 0, 50, Game.npcs)
+        from Wall import Wall
+        Wall(-50,-50,100,100)
         while True:
             while len(Game.players) == 0:
                 time.sleep(0.5)
@@ -143,6 +145,7 @@ class Game(Namespace):
             "bullets": [Game.bullets[bullet].update_json() for bullet in Game.bullets],
             "npcs": [Game.npcs[npc].init_json() for npc in Game.npcs],
             "dropped_items":[Game.dropped_items[item].init_json() for item in Game.dropped_items],
+            "walls": [wall.init_json() for wall in Game.walls]
         }
         emit("init",game_data)
 
@@ -153,6 +156,7 @@ class Game(Namespace):
             "bullets": [Game.bullets[bullet].update_json() for bullet in Game.bullets],
             "npcs": [Game.npcs[npc].init_json() for npc in Game.npcs],
             "dropped_items":[Game.dropped_items[item].init_json() for item in Game.dropped_items],
+            "walls": [wall.init_json() for wall in Game.walls]
         }
         emit("init",game_data)
     
