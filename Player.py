@@ -63,6 +63,12 @@ class Player(EntityWithItems):
             self.vx = 0
 
         super().update()
+        
+        # Check colision with walls.
+        for wall in Game.walls:
+            if wall.is_colliding(self):
+                self.repel()
+                break
 
         for i in list(self.items.keys()):
             item = self.items[i]
@@ -97,6 +103,12 @@ class Player(EntityWithItems):
 
     def shootBullet(self, angle):
         self.weapons[self.current_weapon].shootBullet(angle)
+
+    def place_wall(self, blueprint):
+        if self.money >= 10:
+            self.money -= 10
+            from Wall import Wall
+            Wall(blueprint["x"],blueprint["y"],blueprint["w"],blueprint["h"])
 
     def init_json(self):
         entity_json = super().toJson()

@@ -14,6 +14,8 @@ let bullets = {};
 let npcs = {};
 let walls = {};
 let dropped_items = {};
+let blueprint_wall = new Wall({"id": Math.random(),"x": 0,"y": 0,"w":50,"h":50, "visible": false});
+
 let mysocketid;
 
 let world_x = 0;
@@ -62,13 +64,18 @@ class World {
             else if (e.code === "Digit4") socket.emit('keypress', { inputId: "switch_weapon", state: 4 })
             else if (e.code === "Digit5") socket.emit('keypress', { inputId: "switch_weapon", state: 5 })
             else if (e.code === "Digit6") socket.emit('keypress', { inputId: "switch_weapon", state: 6 })
+            else if (e.code === "KeyB") blueprint_wall.visible = !blueprint_wall.visible;
         });
 
         document.addEventListener("mousedown", () => {
             if (players[mysocketid] === undefined)
                 return;
-
-            socket.emit('keypress', { inputId: "attack", state: true });
+            if(!blueprint_wall.visible)
+                socket.emit('keypress', { inputId: "attack", state: true });
+            else{
+                blueprint_wall.visible = false;
+                socket.emit('keypress', { inputId: "build", state: blueprint_wall})
+            }
         })
 
         document.addEventListener("mouseup", () => {
@@ -86,6 +93,10 @@ class World {
             let y = -htmlCanvas.height / 2 + e.clientY
             let angle = (Math.atan2(y, x) / Math.PI) * 180.0;
             players[mysocketid].angle = angle;
+            if (blueprint_wall != null){
+                blueprint_wall.x = x + players[mysocketid].x - blueprint_wall.w / 2;
+                blueprint_wall.y = y + players[mysocketid].y - blueprint_wall.h / 2;
+            }
             socket.emit('keypress', { inputId: "mouseAngle", state: angle });
         });
     }
@@ -301,6 +312,14 @@ class World {
                     }
                 }
             }
+            if (data.walls) {
+                for (const wall of data.walls) {
+                    let w = walls[wall.id]
+                    if(w){
+                        w.hp = wall.hp;
+                    }
+                }
+            }
         });
 
         socket.on("remove", function (data) {
@@ -327,6 +346,12 @@ class World {
             if (data.dropped_items) {
                 for (let i = 0; i < data.dropped_items.length; i++) {
                     delete dropped_items[data.dropped_items[i]];
+                }
+            }
+
+            if (data.walls) {
+                for (let i = 0; i < data.walls.length; i++) {
+                    delete walls[data.walls[i]];
                 }
             }
         });

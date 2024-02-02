@@ -26,12 +26,12 @@ class Player extends ColisionEntity {
 
         super.drawHpBar(x, y);
 
+        this.drawRotatedPlayer(x, y);
+
         ctx.fillStyle = "black";
         ctx.font = "16px serif";
         ctx.textAlign = "center";
         ctx.fillText(this.name, x, y - 40);
-
-        this.drawRotatedPlayer(x, y);
     }
 
     drawRotatedPlayer(x, y) {

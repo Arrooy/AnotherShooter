@@ -24,7 +24,6 @@ class NPC extends ColisionEntity {
         ctx.fillStyle = "brown";
         //ctx.fillRect(x - this.size / 2, y - this.size / 2, this.size, this.size);
         //ctx.strokeRect(x - this.size / 2, y - this.size / 2, this.size, this.size);
-        console.log("thisAngle",this.angle)
         this.drawRotatedPlayer(x,y);
     }
 

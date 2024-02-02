@@ -43,6 +43,11 @@ class NPC(EntityWithItems):
         self.behave(closest_player, distance)
         super().update()
         
+        for wall in Game.walls:
+            if wall.is_colliding(self):
+                self.repel()
+                break
+        
         # Check colision with other ColisionEntities.
         if closest_player is not None and self.check_colision_stop(closest_player):
             # Touched a player

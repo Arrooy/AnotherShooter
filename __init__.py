@@ -75,12 +75,16 @@ class Game(Namespace):
             player = Game.players[i]
             if player.getDistancexy(x,y) < player.size/2+size/2:
                 x,y = Game.generate_empty_coords(spawn_x, spawn_y, area, size, iterations+1)
+    
+        for wall in Game.walls:
+            if wall.is_colliding_xy(x,y):
+                x,y = Game.generate_empty_coords(spawn_x, spawn_y, area, size, iterations+1)
         
         return x,y
         
     def thread_function(sock):
         from SpawningPool import SpawningPool
-        spawning_pool = SpawningPool(500, 0, 50, Game.npcs)
+        spawning_pool = SpawningPool(500, 0, 0, Game.npcs)
         from Wall import Wall
         Wall(-50,-50,100,100)
         while True:
@@ -91,13 +95,19 @@ class Game(Namespace):
                              
                 spawning_pool.update()
                 
-                to_remove = {"players":[], "bullets":[], "npcs":[], "dropped_items":[]}            
+                to_remove = {"players":[], "bullets":[], "npcs":[], "dropped_items":[], "walls":[]}            
                 
                 # Update game and check for any entity that needs to be removed.
                 Game.update_list("bullets", Game.bullets, to_remove)
                 Game.update_list("players", Game.players, to_remove)
                 Game.update_list("npcs", Game.npcs, to_remove)
                 Game.update_list("dropped_items", Game.dropped_items, to_remove)
+                for wall in Game.walls:
+                    wall.update()
+                    if wall.toRemove:
+                        to_remove["walls"].append(wall.id)
+                        Game.walls.remove(wall)
+                
                 
                 # init data
                 if Game.new_stuff:
@@ -113,6 +123,9 @@ class Game(Namespace):
                     if "dropped_items" in Game.new_stuff:
                         game_data.update({"dropped_items": [Game.new_stuff["dropped_items"][item].init_json() for item in Game.new_stuff["dropped_items"]]})
                     
+                    if "walls" in Game.new_stuff:
+                        game_data.update({"walls": [Game.new_stuff["walls"][wall].init_json() for wall in Game.new_stuff["walls"]]})
+                                        
                     socketio.emit("init", game_data, namespace="/game")
                     Game.new_stuff = {}           
                      
@@ -120,11 +133,12 @@ class Game(Namespace):
                     "players": [Game.players[player].update_json() for player in Game.players],
                     "bullets": [Game.bullets[bullet].update_json() for bullet in Game.bullets],
                     "npcs":    [Game.npcs[npc].update_json() for npc in Game.npcs],
+                    "walls":   [wall.update_json() for wall in Game.walls]
                 }
                 socketio.emit("update", game_data, namespace="/game")
                 
                 # Remove data
-                if to_remove["players"] or to_remove["bullets"] or to_remove["npcs"] or to_remove["dropped_items"]:
+                if to_remove["players"] or to_remove["bullets"] or to_remove["npcs"] or to_remove["dropped_items"] or to_remove["walls"]:
                     socketio.emit("remove", to_remove, namespace="/game")
                     
             """except Exception as e: 
@@ -190,4 +204,7 @@ class Game(Namespace):
             player.mouseAngle = data["state"]
         if data["inputId"] == "switch_weapon":
             player.switch_weapon(data["state"])
-
+            
+        if data["inputId"] == "build":
+            blueprint = data["state"]
+            player.place_wall(blueprint)

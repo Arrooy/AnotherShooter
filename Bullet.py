@@ -40,6 +40,12 @@ class Bullet(ColisionEntity):
             # Only one colision per bullet
             if self.check_colision(Game.npcs[i]):
                 return
+    
+        for wall in Game.walls:
+            if wall.hp > 0 and wall.is_colliding(self):
+                wall.hp -= self.damage
+                self.toRemove = True
+                return
         
     def check_colision(self, objective):
             

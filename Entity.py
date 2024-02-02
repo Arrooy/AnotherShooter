@@ -19,12 +19,6 @@ class Entity():
     def update(self):
         self.x = self.x + self.vx
         self.y = self.y + self.vy
-        
-        for wall in Game.walls:
-            if wall.is_colliding(self):
-                self.x = self.x - self.vx
-                self.y = self.y - self.vy
-                break
             
         # Hard stops of the world.
         if self.x < -1000 or self.x > 1000:
@@ -61,12 +55,15 @@ class ColisionEntity(Entity):
     def check_colision_repel(self, objective):
         if self.check_colision(self.id, objective):
             # Repel the colision
-            self.x = self.x - self.vx
-            self.y = self.y - self.vy
-            self.vx *= -1
-            self.vy *= -1
+            self.repel()
             return True
         return False
+
+    def repel(self):
+        self.x = self.x - self.vx
+        self.y = self.y - self.vy
+        self.vx *= -1
+        self.vy *= -1
     
     def stop(self):
         self.x = self.x - self.vx
