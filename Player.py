@@ -2,7 +2,7 @@ from extensions import socketio
 from __init__ import Game
 from Weapon import Weapon, Shotgun, GranadeLauncher, Rocket, MachineGun, Sniper
 from Entity import EntityWithItems
-
+from math import sqrt 
 from Item import BigCashStack
 
 
@@ -61,7 +61,13 @@ class Player(EntityWithItems):
             self.vx = -self.max_speed
         else:
             self.vx = 0
-
+        
+        if self.vx != 0 and self.vy != 0:
+            # Normalize vector
+            self.vx = self.max_speed * self.vx / sqrt(pow(self.vx, 2) + pow(self.vy, 2))
+            self.vy = self.max_speed * self.vy / sqrt(pow(self.vx, 2) + pow(self.vy, 2))
+            
+        
         super().update()
         
         # Check colision with walls.
