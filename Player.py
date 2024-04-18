@@ -19,7 +19,7 @@ class Player(EntityWithItems):
         self.maxHp = 10
 
         self.score = 0
-        self.money = 0
+        self.money = 50
 
         self.current_weapon = 0
         self.weapons = [
